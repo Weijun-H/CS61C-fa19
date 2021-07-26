@@ -1,2 +1,3 @@
-# Project 1 
-Don't read me. Check out https://cs61c.org/projects/proj1/ instead.
+# sp21-proj1-starter
+
+Please add a description about what you created! Also add lessons you learned or bugs you encountered. 
