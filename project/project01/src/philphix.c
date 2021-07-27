@@ -87,7 +87,12 @@ int stringEquals(void *s1, void *s2) {
   // -- TODO --
   fprintf(stderr, "You need to implement stringEquals");
   /* To suppress compiler warning until you implement this function */
-  return 0;
+  char *temp1 = s1, *temp2 = s2;
+  while(temp1 != NULL && temp2 != NULL) {
+    if (*temp1++ != *temp2++) return 0;
+  }
+  if (temp1 != temp2) return 0;
+  return 1;
 }
 
 /*
