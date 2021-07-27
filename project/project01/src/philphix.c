@@ -70,9 +70,13 @@ int main(int argc, char **argv) {
 unsigned int stringHash(void *s) {
   // -- TODO --
   fprintf(stderr, "need to implement stringHash\n");
+  unsigned int hash = 5381;
+  int c;
+  while (c = (char *)s++)
+    hash = ((hash << 5) + hash) + c; /* hash * 33 + c */
 
+  return hash;
   /* To suppress compiler warning until you implement this function, */
-  return 0;
 }
 
 /*
