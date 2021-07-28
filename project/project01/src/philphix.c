@@ -109,7 +109,40 @@ int stringEquals(void *s1, void *s2) {
  */
 void readDictionary(char *dictName) {
   // -- TODO --
-  fprintf(stderr, "You need to implement readDictionary\n");
+  FILE *fp;
+  char *word = (char*)malloc(sizeof(char) * 80);
+  int total = 80; 
+  int i = 0; 
+  char c;
+  fp = fopen(dictName, "r");
+  if(fp == NULL) {
+    fprintf(stderr, "Can't find the dictionary file.");
+    exit(1);
+  }
+
+  while((c = fgetc(fp)) != EOF){
+    if(c == '\n') {
+      char *key = (char *)malloc((i + 1) * sizeof(char));
+      memcpy(key, word, i);
+      key[i] = '\0';
+      if(findData(dictionary, key) == NULL) {
+        insertData(dictionary, key, key);
+      }
+      i = 0;
+      continue;
+    }
+
+    if(i == total) {
+      word = (char *)realloc(word, total *= 2);
+      total *= 2;
+    }
+    word[i] = c;
+    i += 1;
+  }
+
+  free(word);
+  fclose(fp);
+
 }
 
 /*
@@ -136,5 +169,60 @@ void readDictionary(char *dictName) {
  */
 void processInput() {
   // -- TODO --
-  fprintf(stderr, "You need to implement processInput\n");
+  int total = 50;
+  char *str1 = (char *)malloc(sizeof(char) * total);
+  char *str2 = (char *)malloc(sizeof(char) * total);
+  char *str3 = (char *)malloc(sizeof(char) * total);
+  int i = 0;
+  int c = 0;
+  while((c = fgetc(stdin)) != EOF) {
+    // 内存满了
+    if(i == total) {
+      str1 = (char *)realloc(str1, total *= 2);
+      str2 = (char *)realloc(str2, total *= 2);
+      str3 = (char *)realloc(str3, total *= 2);
+      total *= 2;
+    }
+
+    if(isalpha(c) != 0) {
+      // 读取到的为字母
+      // 1. The word itself
+      str1[i] = (char) c;
+      // 2. The word converted entirely to lowercase letters
+      str2[i] = (char) tolower(c);
+      // 3. The word with all but the first letter converted to lowercase.
+      // if(i == 0) {
+      //   str3[i] = (char) toupper(c);
+      // } else {
+      //   str3[i] = (char) tolower(c);
+      // }
+      str3[i] = (i==0) ? c : (char)tolower(c);
+      i += 1;    
+    } else {
+     // 读取到的为非字母
+     if(isalpha(str1[0])) {
+       // 有词储存
+       str1[i] = '\0';
+       str2[i] = '\0';
+       str3[i] = '\0';
+       // 检查是否在字典里出现
+       if (findData(dictionary, str1) == NULL && findData(dictionary, str2) == NULL && findData(dictionary, str3) == NULL) {
+         fprintf(stdout, "%s [sic]%c", str1, c);
+       } else {
+         fprintf(stdout, "%s%c", str1, c);
+       }
+     } else {
+       //没有词储存
+       fprintf(stdout, "%c", c);
+     }
+     i = 0;
+     memset(str1, 0, strlen(str1));
+     memset(str2, 0, strlen(str2));
+     memset(str3, 0, strlen(str3));
+   }
+  }
+
+  free(str1);
+  free(str2);
+  free(str3);
 }
