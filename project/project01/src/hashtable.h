@@ -30,8 +30,8 @@ typedef struct HashTable {
   // HINT: Take a look at createHashTable.
   int size;
   struct HashBucket** data;
-  int (*hashFunction)(void *);  
-  int (*equalFunction)(void *);
+  unsigned int (*hashFunction)(void *);  
+  int (*equalFunction)(void *, void *);
   // struct HashBucket* HashBucketArray;
 } HashTable;
 

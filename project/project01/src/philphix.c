@@ -67,16 +67,21 @@ int main(int argc, char **argv) {
  * This should hash a string to a bucket index.  void *s can be safely cast
  * to a char * (null terminated string)
  */
-unsigned int stringHash(void *s) {
-  // -- TODO --
-  fprintf(stderr, "need to implement stringHash\n");
-  unsigned int hash = 5381;
-  int c;
-  while (c = (char *)s++)
-    hash = ((hash << 5) + hash) + c; /* hash * 33 + c */
+unsigned int stringHash(void *s){
+  char *string = (void *) s;
+  /* Printing string is to prevent a compiler warning until you
+     actually implement this function */
+  /* fprintf(stderr, "need to implement stringHash%s\n", string); */
 
-  return hash;
-  /* To suppress compiler warning until you implement this function, */
+  unsigned int hashCode = 0;
+  unsigned int coef = 1;
+  while (*string) {
+    hashCode += coef * (*string);
+    coef *= 31;
+    string++;
+  }
+  // printf("%s %d\n", (char*)s, hashCode);
+  return hashCode;
 }
 
 /*
@@ -85,14 +90,14 @@ unsigned int stringHash(void *s) {
  */
 int stringEquals(void *s1, void *s2) {
   // -- TODO --
-  fprintf(stderr, "You need to implement stringEquals");
-  /* To suppress compiler warning until you implement this function */
-  char *temp1 = s1, *temp2 = s2;
-  while(temp1 != NULL && temp2 != NULL) {
-    if (*temp1++ != *temp2++) return 0;
+  char *string1 = (char *)s1;
+  char *string2 = (char *)s2;
+  // -- TODO --
+  if(strcmp(string1, string2) == 0) {
+    return 1;
+  } else {
+    return 0;
   }
-  if (temp1 != temp2) return 0;
-  return 1;
 }
 
 /*
@@ -107,42 +112,20 @@ int stringEquals(void *s1, void *s2) {
  * NOT exist, you should print some message to standard error and call exit(61)
  * to cleanly exit the program.
  */
-void readDictionary(char *dictName) {
-  // -- TODO --
-  FILE *fp;
-  char *word = (char*)malloc(sizeof(char) * 80);
-  int total = 80; 
-  int i = 0; 
-  char c;
-  fp = fopen(dictName, "r");
-  if(fp == NULL) {
-    fprintf(stderr, "Can't find the dictionary file.");
+void readDictionary(char *name){
+  FILE *inputFile = fopen(name, "r");
+  if (!inputFile) {
+    fprintf(stderr, "Error: open dictionary file failed: %s\n", name);
     exit(1);
   }
-
-  while((c = fgetc(fp)) != EOF){
-    if(c == '\n') {
-      char *key = (char *)malloc((i + 1) * sizeof(char));
-      memcpy(key, word, i);
-      key[i] = '\0';
-      if(findData(dictionary, key) == NULL) {
-        insertData(dictionary, key, key);
+  char key[1024], value[1024];
+  while (fscanf(inputFile, " %1023s", key) == 1) {
+      if (fscanf(inputFile, " %1023s", value) == 1) {
+        fprintf(stderr, "readDictionary: insert (%s, %s)\n", key, value);
+        insertData(dictionary, key, value);
       }
-      i = 0;
-      continue;
-    }
-
-    if(i == total) {
-      word = (char *)realloc(word, total *= 2);
-      total *= 2;
-    }
-    word[i] = c;
-    i += 1;
   }
-
-  free(word);
-  fclose(fp);
-
+  fclose(inputFile);
 }
 
 /*
@@ -167,62 +150,84 @@ void readDictionary(char *dictName) {
  * numbers and punctuation) which are longer than 60 characters. Again, for the 
  * final bit of your grade, you cannot assume words have a bounded length.
  */
-void processInput() {
-  // -- TODO --
-  int total = 50;
-  char *str1 = (char *)malloc(sizeof(char) * total);
-  char *str2 = (char *)malloc(sizeof(char) * total);
-  char *str3 = (char *)malloc(sizeof(char) * total);
-  int i = 0;
-  int c = 0;
-  while((c = fgetc(stdin)) != EOF) {
-    // 内存满了
-    if(i == total) {
-      str1 = (char *)realloc(str1, total *= 2);
-      str2 = (char *)realloc(str2, total *= 2);
-      str3 = (char *)realloc(str3, total *= 2);
-      total *= 2;
+void processInput()
+{
+    // -- TODO --
+    char *str1 = (char *)malloc(70);
+    char *str2 = (char *)malloc(70);
+    char *str3 = (char *)malloc(70);
+    int c = 0;
+    int i = 0;
+    int total = 70;
+
+    while ((c = fgetc(stdin)) != EOF)
+    {
+
+        if (isalpha(c) != 0)
+        {
+            if (i == total)
+            {
+                str1 = (char *)realloc(str1, total * 2);
+                str2 = (char *)realloc(str2, total * 2);
+                str3 = (char *)realloc(str3, total * 2);
+                total = total * 2;
+            }
+            str1[i] = (char)c;
+            if (i == 0)
+            {
+                str2[i] = (char)c;
+            }
+            else
+            {
+                str2[i] = (char)tolower(c);
+            }
+            str3[i] = (char)tolower(c);
+            i++;
+        }
+        else
+        {
+            if (isalpha(str1[0]))
+            {
+                str1[i] = '\0';
+                str2[i] = '\0';
+                str3[i] = '\0';
+                if (findData(dictionary, str1) == NULL && findData(dictionary, str2) == NULL && findData(dictionary, str3) == NULL)
+                {
+                    fprintf(stdout, "%s [sic]%c", str1, c);
+                }
+                else
+                {
+                    fprintf(stdout, "%s%c", str1, c);
+                }
+            }
+            else
+            {
+                fprintf(stdout, "%c", c);
+            }
+            i = 0;
+            memset(str1, 0, strlen(str1));
+            memset(str2, 0, strlen(str2));
+            memset(str3, 0, strlen(str3));
+        }
     }
-
-    if(isalpha(c) != 0) {
-      // 读取到的为字母
-      // 1. The word itself
-      str1[i] = (char) c;
-      // 2. The word converted entirely to lowercase letters
-      str2[i] = (char) tolower(c);
-      // 3. The word with all but the first letter converted to lowercase.
-      // if(i == 0) {
-      //   str3[i] = (char) toupper(c);
-      // } else {
-      //   str3[i] = (char) tolower(c);
-      // }
-      str3[i] = (i==0) ? c : (char)tolower(c);
-      i += 1;    
-    } else {
-     // 读取到的为非字母
-     if(isalpha(str1[0])) {
-       // 有词储存
-       str1[i] = '\0';
-       str2[i] = '\0';
-       str3[i] = '\0';
-       // 检查是否在字典里出现
-       if (findData(dictionary, str1) == NULL && findData(dictionary, str2) == NULL && findData(dictionary, str3) == NULL) {
-         fprintf(stdout, "%s [sic]%c", str1, c);
-       } else {
-         fprintf(stdout, "%s%c", str1, c);
-       }
-     } else {
-       //没有词储存
-       fprintf(stdout, "%c", c);
-     }
-     i = 0;
-     memset(str1, 0, strlen(str1));
-     memset(str2, 0, strlen(str2));
-     memset(str3, 0, strlen(str3));
-   }
-  }
-
-  free(str1);
-  free(str2);
-  free(str3);
+    if (isalpha(str1[0]))
+    {
+        str1[i] = '\0';
+        str2[i] = '\0';
+        str3[i] = '\0';
+        if (findData(dictionary, str1) == NULL && findData(dictionary, str2) == NULL && findData(dictionary, str3) == NULL)
+        {
+            fprintf(stdout, "%s [sic]", str1);
+        }
+        else
+        {
+            if (strlen(str1) != 0)
+            {
+                fprintf(stdout, "%s", str1);
+            }
+        }
+    }
+    free(str1);
+    free(str2);
+    free(str3);
 }

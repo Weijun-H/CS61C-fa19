@@ -40,22 +40,25 @@ void insertData(HashTable *table, void *key, void *data) {
   // 1. Find the right hash bucket location with table->hashFunction.
   // 2. Allocate a new hash bucket struct.
   // 3. Append to the linked list or create it if it does not yet exist. 
-  int index = table->hashFunction(key);
-  HashBucket *step = table->data[index];
-  HashBucket *newData = (HashBucket *)malloc(sizeof(HashBucket));
-  newData->key = key;
-  newData->data = data;
-  newData->next = NULL;
+  unsigned int location = table->hashFunction(key) % table->size;
+  HashBucket *step = table->data[location];
+  HashBucket *curr = step;
+  
+  HashBucket *newBucket = (HashBucket *) malloc(sizeof(HashBucket));
+  newBucket->next = NULL;
+  newBucket->data = data;
+  newBucket->key = key;
 
-  if (step == NULL) {
-    step = newData;
-    return;
-  } 
-  while (step->next != NULL){
-    step = step->next;
+  if (step != NULL) {
+    while (step != NULL) {
+      curr = step;
+      step = step->next;
+    }
+    curr->next = step;
+  } else {
+    curr = newBucket;
   }
-  step->next = newData;
-  return;
+
 }
 
 /*
@@ -67,11 +70,14 @@ void *findData(HashTable *table, void *key) {
   // HINT:
   // 1. Find the right hash bucket with table->hashFunction.
   // 2. Walk the linked list and check for equality with table->equalFunction.
-  int index = table->hashFunction(key);
-  HashBucket *step = table->data[index];
-  while (step != NULL) {
-    if (table->equalFunction(key, step->data)) return step->data; 
-    step = step->next;
+  unsigned int location = table->hashFunction(key) % table->size;
+  struct HashBucket *lookAt = 
+    table->data[location];
+  while(lookAt != NULL){
+    if(table->equalFunction(key, lookAt->key) != 0){
+      return lookAt->data;
+    }
+    lookAt = lookAt->next;
   }
   return NULL;
 }
