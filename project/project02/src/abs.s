@@ -10,10 +10,13 @@
 # =================================================================
 abs:
     # Prologue
+    bge a0, x0, end
 
-    # return 0
-    mv a0, zero
+    xori a0, a0, 0xFF
+
+    # # return 0
+    # mv a0, zero
 
     # Epilogue
 
-    ret
+end:    ret
