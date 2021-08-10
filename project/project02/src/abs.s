@@ -9,14 +9,14 @@
 #	a0 (int) the absolute value of the input
 # =================================================================
 abs:
+ebreak
     # Prologue
     bge a0, x0, end
 
-    xori a0, a0, 0xFF
-
+    sub a0, zero, a0
     # # return 0
     # mv a0, zero
 
     # Epilogue
 
-end:    ret
+end: ret
