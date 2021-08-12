@@ -3,6 +3,18 @@ from framework import AssemblyTest, print_coverage
 
 
 class TestAbs(TestCase):
+    def test_minus_one(self):
+        # Indicates we are creating the test for the `abs.s` file
+        t = AssemblyTest(self, "abs.s")
+        # Setting the argument register a0 to have value of -1
+        t.input_scalar("a0", -1)
+        # Calling the abs function
+        t.call("abs")
+        # The a0 register is now the return value
+        # Checking if a0 is now 1
+        t.check_scalar("a0", 1)
+        t.execute()
+
     def test_zero(self):
         t = AssemblyTest(self, "abs.s")
         # load 0 into register a0
@@ -42,7 +54,14 @@ class TestRelu(TestCase):
         t.check_array(array0, [1, 0, 3, 0, 5, 0, 7, 0, 9])
         # generate the `assembly/TestRelu_test_simple.s` file and run it through venus
         t.execute()
-
+        
+    def test_empty(self):
+        t = AssemblyTest(self, "relu.s")
+        array0 = t.array([])
+        t.input_array("a0", array0)
+        t.input_scalar("a1", len(array0))
+        t.call("relu")
+        t.execute(code=32)
     @classmethod
     def tearDownClass(cls):
         print_coverage("relu.s", verbose=False)
