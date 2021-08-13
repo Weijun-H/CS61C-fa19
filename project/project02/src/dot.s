@@ -18,27 +18,38 @@
 #   this function terminates the program with error code 33
 # =======================================================
 dot:
+    li t0, 0
+    li t4, 1
 
-    # Prologue
+    blt a2, t4, length_error
+    blt a3, t4, stride_error
+    blt a4, t4, stride_error
 
+    slli a3, a3, 2
+    li t1, 0 # t1 = temp 
 
 loop_start:
+    li t2, 0 # t2 is the multiple result
+    lw t3, 0(a0) # t3 = a0[i]
+    lw t5, 0(a1) # t5 = a1[i]
+    mul t2, t3, t5
+    add t1, t1, t2
 
-
-
-
-
-
-
-
-
-
-
+loop_continue:
+    add a0, a0, a3
+    add a1, a1, a3
+    add t0, t0, a4
+    bge	t0, a2, loop_end # if t0 > the number of the array
+    j loop_start
 
 loop_end:
-
-
-    # Epilogue
-
-    
+    add a0, t1, x0
     ret
+
+length_error:
+    li a1, 32
+    j exit2
+
+stride_error:
+    li a1, 33
+    j exit2
