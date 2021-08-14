@@ -20,15 +20,20 @@
 dot:
     li t0, 0
     li t4, 1
+    add t5, a4, x0
 
     blt a2, t4, length_error
     blt a3, t4, stride_error
     blt a4, t4, stride_error
 
     slli a3, a3, 2
+    slli a4, a4, 2
+
+
     li t1, 0 # t1 = temp 
 
 loop_start:
+
     li t2, 0 # t2 is the multiple result
     lw t3, 0(a0) # t3 = a0[i]
     lw t5, 0(a1) # t5 = a1[i]
@@ -37,8 +42,8 @@ loop_start:
 
 loop_continue:
     add a0, a0, a3
-    add a1, a1, a3
-    add t0, t0, a4
+    add a1, a1, a4
+    addi t0, t0, 1
     bge	t0, a2, loop_end # if t0 > the number of the array
     j loop_start
 
