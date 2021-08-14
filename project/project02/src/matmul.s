@@ -26,10 +26,18 @@
 matmul:
 
     # Error checks
-
+    #   The dimension of m0 do not make sense
+    bge x0, a1, exception
+    bge x0, a2, exception
+    #   The dimension of m0 do not make sense
+    bge x0, a4, exception
+    bge x0, a5, exception
+    #    The dimensions of m0 and m1 don't match
+    bne a1, a5, exception
+    bne a2, a4, exception
 
     # Prologue
-
+    
 
 outer_loop_start:
 
@@ -55,9 +63,11 @@ inner_loop_end:
 
 
 outer_loop_end:
-
+    ret
 
     # Epilogue
+exception:
+    li a1, 34
+    j exit2
+
     
-    
-    ret
