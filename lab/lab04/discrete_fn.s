@@ -77,6 +77,14 @@ main:
 # Think: why might having a1 be useful?
 f:
     # YOUR CODE GOES HERE!
+    mv t0, a0
+    mv t1, a1
+    li t2, 4
+    addi t0, t0, 3
+    mul t0, t0, t2
+
+    add a1, a1, t0
+    lw a0, 0(a1)
 
     jr ra               # Always remember to jr ra after your function!
 
