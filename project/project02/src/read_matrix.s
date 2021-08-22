@@ -52,12 +52,15 @@ read_matrix:
     mv a2, s1
     li a3, 4
     jal fread
-    
+    li t1, -1
+    beq a0, t1, read_error # If fail to read 
 
     mv a1, s0
     mv a2, s2
     li a3, 4
     jal fread 
+    li t1, -1
+    beq a0, t1, read_error # If fail to read
 
     # Get the number of elements
     lw t1, 0(s1)
