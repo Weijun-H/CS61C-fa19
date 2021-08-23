@@ -254,8 +254,12 @@ class TestWriteMatrix(TestCase):
         # load output file name into a0 register
         t.input_write_filename("a0", outfile)
         # load input array and other arguments
-        raise NotImplementedError("TODO")
+        # raise NotImplementedError("TODO")
+        array0 = t.array([1, 2, 3, 4, 5, 6, 7, 8, 9])
         # TODO
+        t.input_array("a1", array0)
+        t.input_scalar("a2", 3)
+        t.input_scalar("a3", 3)
         # call `write_matrix` function
         t.call("write_matrix")
         # generate assembly and run it through venus
@@ -265,6 +269,18 @@ class TestWriteMatrix(TestCase):
 
     def test_simple(self):
         self.do_write_matrix()
+
+    def test_malloc_exception(self):
+        self.do_write_matrix(fail='malloc', code=48)
+
+    def test_fopen_exception(self):
+        self.do_write_matrix(fail='fopen', code=64)
+
+    def test_fclose_exception(self):
+        self.do_write_matrix(fail='fclose', code=65)
+
+    def test_write_exception(self):
+        self.do_write_matrix(fail='fwrite', code=67)
 
     @classmethod
     def tearDownClass(cls):
@@ -295,7 +311,6 @@ class TestClassify(TestCase):
         t.execute(args=args)
 
         # compare the output file and
-        raise NotImplementedError("TODO")
         # TODO
         # compare the classification output with `check_stdout`
 
