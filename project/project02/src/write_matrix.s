@@ -51,8 +51,10 @@ write_matrix:
     # assign the memory for the row ans column
     li a0, 8
     jal malloc
-    beq a0, x0, malloc_error
+    # beq a0, x0, malloc_error
     mv s4, a0   # s3 = the address of the row and column
+    sw s2, 0(a0)
+    sw s3, 4(a0)
 
     # Start to write the row and column 
     mv a1, s0
@@ -83,6 +85,7 @@ loop_start:
 
     jal fwrite
 
+    beq a0, x0, write_error
     lw t0, 0(sp)
     addi sp, sp, 4
 
