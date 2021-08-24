@@ -265,13 +265,11 @@ class TestWriteMatrix(TestCase):
         # generate assembly and run it through venus
         t.execute(fail=fail, code=code)
         # compare the output file against the reference
-        t.check_file_output(outfile, "outputs/test_write_matrix/reference.bin")
+        if not fail:
+            t.check_file_output(outfile, "outputs/test_write_matrix/reference.bin")
 
     def test_simple(self):
         self.do_write_matrix()
-
-    def test_malloc_exception(self):
-        self.do_write_matrix(fail='malloc', code=48)
 
     def test_fopen_exception(self):
         self.do_write_matrix(fail='fopen', code=64)
