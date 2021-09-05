@@ -62,7 +62,7 @@ long long int sum_simd(int vals[NUM_ELEMS]) {
 			tmp = _mm_and_si128(tmp, mask);
 			tmp_sum = _mm_add_epi32(tmp, tmp_sum);
 		}	
-        
+
 		_mm_storeu_si128((__m128i*)results, tmp_sum);
 		/* You'll need a tail case. */
 		for (; i < NUM_ELEMS; i++) {
@@ -86,10 +86,40 @@ long long int sum_simd_unrolled(int vals[NUM_ELEMS]) {
     /* DO NOT MODIFY ANYTHING ABOVE THIS LINE (in this function) */
 
     for(unsigned int w = 0; w < OUTER_ITERATIONS; w++) {
-        /* YOUR CODE GOES HERE */
-        /* Copy your sum_simd() implementation here, and unroll it */
+		/* COPY AND PASTE YOUR sum_simd() HERE */
+		/* MODIFY IT BY UNROLLING IT */
+        unsigned int results[4];
+		int i;
+		__m128i tmp_sum = _mm_setzero_si128();
+		for (i = 0; i + 16 <= NUM_ELEMS; i+=16) {
+			__m128i tmp = _mm_loadu_si128((__m128i*)(vals + i));
+			__m128i mask = _mm_cmpgt_epi32(tmp, _127);
+			tmp = _mm_and_si128(tmp, mask);
+			tmp_sum = _mm_add_epi32(tmp, tmp_sum);
 
-        /* Hint: you'll need 1 or maybe 2 tail cases here. */
+			tmp = _mm_loadu_si128((__m128i*)(vals + i + 4));
+			mask = _mm_cmpgt_epi32(tmp, _127);
+			tmp = _mm_and_si128(tmp, mask);
+			tmp_sum = _mm_add_epi32(tmp, tmp_sum);
+
+			tmp = _mm_loadu_si128((__m128i*)(vals + i + 8));
+			mask = _mm_cmpgt_epi32(tmp, _127);
+			tmp = _mm_and_si128(tmp, mask);
+			tmp_sum = _mm_add_epi32(tmp, tmp_sum);
+
+			tmp = _mm_loadu_si128((__m128i*)(vals + i + 12));
+			mask = _mm_cmpgt_epi32(tmp, _127);
+			tmp = _mm_and_si128(tmp, mask);
+			tmp_sum = _mm_add_epi32(tmp, tmp_sum);
+		}	
+		_mm_storeu_si128((__m128i*)results, tmp_sum);
+		/* You'll need 1 or maybe 2 tail cases here. */
+		for (; i < NUM_ELEMS; i++) {
+			if (vals[i] >= 128) results[0] += vals[i];
+		}
+		for (int j = 0; j < 4; j++) {
+			result += results[j];
+		}
     }
 
     /* DO NOT MODIFY ANYTHING BELOW THIS LINE (in this function) */
