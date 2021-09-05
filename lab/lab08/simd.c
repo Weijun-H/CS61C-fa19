@@ -51,10 +51,26 @@ long long int sum_simd(int vals[NUM_ELEMS]) {
     long long int result = 0;                   // This is where you should put your final result!
     /* DO NOT MODIFY ANYTHING ABOVE THIS LINE (in this function) */
 
+    unsigned int results[4]; // Summarize the results at the end of loop
     for(unsigned int w = 0; w < OUTER_ITERATIONS; w++) {
         /* YOUR CODE GOES HERE */
-
-        /* Hint: you'll need a tail case. */
+        int i;
+		__m128i tmp_sum = _mm_setzero_si128(); // temp_sum = {0, 0, 0, 0}
+		for (i = 0; i + 4 <= NUM_ELEMS; i+=4) {
+			__m128i tmp = _mm_loadu_si128((__m128i*)(vals + i)); // tmp = {vals[i], vals[i+1], vals[i+2], vals[i+2]}
+			__m128i mask = _mm_cmpgt_epi32(tmp, _127); // Determine if vals[i] is equal and greater than 128
+			tmp = _mm_and_si128(tmp, mask);
+			tmp_sum = _mm_add_epi32(tmp, tmp_sum);
+		}	
+        
+		_mm_storeu_si128((__m128i*)results, tmp_sum);
+		/* You'll need a tail case. */
+		for (; i < NUM_ELEMS; i++) {
+			if (vals[i] >= 128) results[0] += vals[i];
+		}
+		for (int j = 0; j < 4; j++) {
+			result += results[j];
+		}
     }
 
     /* DO NOT MODIFY ANYTHING BELOW THIS LINE (in this function) */
